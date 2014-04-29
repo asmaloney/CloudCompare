@@ -13,6 +13,9 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 if( ${USE_GLEW_LIB} )
     include_directories( ${GLEW_LIB_SOURCE_DIR}/include )
+else()
+    # include the Qt 5 headers for OpenGL
+    include_directories( ${EXTERNAL_LIBS_INCLUDE_DIR} )
 endif()
 
 project( CC_FBO_LIB )
