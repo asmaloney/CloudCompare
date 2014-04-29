@@ -18,7 +18,11 @@
 #ifndef CC_SHADER_HEADER
 #define CC_SHADER_HEADER
 
-#include "ccGlew.h"
+#ifdef CC_USE_GLEW
+   #include "ccGlew.h"
+#else
+   #include <QtGui/qopengl.h>
+#endif
 
 //! Generic shader class
 class ccShader
@@ -143,6 +147,14 @@ protected:
     //! Loads an ARB shader from a file
     static GLhandleARB LoadShaderARB(GLenum type, const char *filename);
 
+#if defined( CC_USE_GLEW ) || !defined( __APPLE__ )
+    inline GLhandleARB  _GLuint_to_GLhandleARB( GLuint inUint ) const { return inUint; }
+    inline GLuint       _GLhandleARB_to_GLuint( GLhandleARB inHandle ) const { return inHandle; }
+#else
+    GLhandleARB  _GLuint_to_GLhandleARB( GLuint inUint ) const;
+    GLuint       _GLhandleARB_to_GLuint( GLhandleARB inHandle ) const;
+#endif
+    
     GLhandleARB vert;
     GLhandleARB frag;
 };

@@ -357,7 +357,30 @@ void ccShader::setAttrib4fv(int loc, float* val)
             ccShaderARB
 ************************************/
 
+#if !defined( CC_USE_GLEW ) && defined( __APPLE__ )
+typedef union {
+   GLhandleARB handle;
+   GLuint   uint;
+} arb_handle_uint;
 
+GLhandleARB  ccShaderARB::_GLuint_to_GLhandleARB( GLuint inUint ) const
+{
+   arb_handle_uint   uni;
+   uni.uint = inUint;
+   
+   return uni.handle;
+}
+
+GLuint   ccShaderARB::_GLhandleARB_to_GLuint( GLhandleARB inHandle ) const
+{
+   arb_handle_uint   uni;
+   uni.handle = inHandle;
+   
+   return uni.uint;
+}
+#endif
+
+    
 ccShaderARB::ccShaderARB() : ccShader()
 {
     vert=0;
@@ -374,10 +397,10 @@ void ccShaderARB::reset()
     if (prog>0)
     {
         if (vert)
-            glDetachObjectARB(prog, vert);
+            glDetachObjectARB(_GLuint_to_GLhandleARB(prog), vert);
         if (frag)
-            glDetachObjectARB(prog, frag);
-        glDeleteObjectARB(prog);
+            glDetachObjectARB(_GLuint_to_GLhandleARB(prog), frag);
+        glDeleteObjectARB(_GLuint_to_GLhandleARB(prog));
     }
     prog=0;
 
@@ -392,7 +415,7 @@ void ccShaderARB::reset()
 
 void ccShaderARB::start()
 {
-    glUseProgramObjectARB(prog);
+    glUseProgramObjectARB(_GLuint_to_GLhandleARB(prog));
 }
 
 void ccShaderARB::stop()
@@ -417,73 +440,73 @@ void ccShaderARB::setUniform4fv(int loc, float* value)
 
 void ccShaderARB::setUniform1i(const char* uniform, int value)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform1iARB(loc,value);
 }
 
 void ccShaderARB::setUniform2iv(const char* uniform, int* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform2ivARB(loc,1,val);
 }
 
 void ccShaderARB::setUniform3iv(const char* uniform, int* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform3ivARB(loc,1,val);
 }
 
 void ccShaderARB::setUniform4iv(const char* uniform, int* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform4ivARB(loc,1,val);
 }
 
 void ccShaderARB::setTabUniform4iv(const char* uniform, int size, int* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform4ivARB(loc,size,val);
 }
 
 void ccShaderARB::setUniform1f(const char* uniform, float value)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform1fARB(loc,value);
 }
 
 void ccShaderARB::setUniform2fv(const char* uniform, float* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform2fvARB(loc,1,val);
 }
 
 void ccShaderARB::setUniform3fv(const char* uniform, float* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform3fvARB(loc,1,val);
 }
 
 void ccShaderARB::setUniform4fv(const char* uniform, float* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform4fvARB(loc,1,val);
 }
 
 void ccShaderARB::setTabUniform1fv(const char* uniform, int size, float* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform1fvARB(loc,size,val);
 }
 
 void ccShaderARB::setTabUniform4fv(const char* uniform, int size, float* val)
 {
-	int loc = glGetUniformLocationARB(prog,uniform);
+	int loc = glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniform4fvARB(loc,size,val);
 }
 
 void ccShaderARB::setUniformMatrix4fv(const char* uniform, float* val, bool transpose)
 {
-	int loc	= glGetUniformLocationARB(prog,uniform);
+	int loc	= glGetUniformLocationARB(_GLuint_to_GLhandleARB(prog),uniform);
 	glUniformMatrix4fvARB(loc,1,transpose,val);
 }
 
@@ -532,16 +555,16 @@ bool ccShaderARB::loadProgram(const char *vertexShaderFile, const char *pixelSha
     }
 
 	//creating program
-	prog = glCreateProgramObjectARB();
+	prog = _GLhandleARB_to_GLuint(glCreateProgramObjectARB());
 
 	//attaching shaders
 	if (vert)
-        glAttachObjectARB(prog,vert);
+        glAttachObjectARB(_GLuint_to_GLhandleARB(prog),vert);
 	if (frag)
-        glAttachObjectARB(prog,frag);
+        glAttachObjectARB(_GLuint_to_GLhandleARB(prog),frag);
 
     //linking
-	glLinkProgramARB(prog);
+	glLinkProgramARB(_GLuint_to_GLhandleARB(prog));
 
     //we check for success
     /*GLint linkStatus = GL_TRUE;
