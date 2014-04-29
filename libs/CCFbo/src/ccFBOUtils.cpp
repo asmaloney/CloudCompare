@@ -70,19 +70,14 @@ void ccFBOUtils::DisplayTexture2DCorner(GLuint tex, int w, int h)
 
 //*********** OPENGL EXTENSIONS ***********//
 #ifdef CC_USE_GLEW
-bool ccFBOUtils::InitGLEW()
+GLenum ccFBOUtils::InitGLEW()
 {
-    // GLEW initialization
-    GLenum code = glewInit();
-    if(code != GLEW_OK)
-        return false;
-
-    return true;
+    return glewInit();
 }
 
 bool ccFBOUtils::CheckExtension(const char *extName)
 {
-	if (!InitGLEW())
+	if ( InitGLEW() != GLEW_OK )
 		return false;
 
     return (glewIsSupported(extName)>0);
@@ -118,4 +113,9 @@ bool ccFBOUtils::CheckShadersAvailability()
 bool ccFBOUtils::CheckFBOAvailability()
 {
     return CheckExtension("GL_EXT_framebuffer_object");
+}
+
+bool ccFBOUtils::CheckVBOAvailability()
+{
+    return CheckExtension("GL_ARB_vertex_buffer_object");
 }

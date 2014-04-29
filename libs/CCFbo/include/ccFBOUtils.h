@@ -49,7 +49,7 @@ public:
 
 #ifdef CC_USE_GLEW
     //! Loads all available OpenGL extensions
-    static bool InitGLEW();
+    static GLenum InitGLEW();
 #endif
 
     //! Checks for availability of a given OpenGL extension
@@ -60,6 +60,9 @@ public:
 
     //! Shortcut: checks FBO support
     static bool CheckFBOAvailability();
+    
+    //! Shortcut: checks VBO support
+    static bool CheckVBOAvailability();
 };
 
 #endif
