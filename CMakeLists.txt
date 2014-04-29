@@ -44,7 +44,7 @@ set( INSTALL_DESTINATIONS CloudCompare )
 # CCViewer
 OPTION( OPTION_BUILD_CCVIEWER "Check to compile CCViewer project" ON )
 if( ${OPTION_BUILD_CCVIEWER} )
-	list( APPEND INSTALL_DESTINATIONS ccViewer )
+    list( APPEND INSTALL_DESTINATIONS ccViewer )
 endif()
 
 # Load advanced scripts
@@ -59,12 +59,12 @@ include( CMakeExternalLibs.cmake )
 include( contrib/AllSupport.cmake )
 
 # GLEW lib
-if( !USE_QT5 )
+if( ${USE_QT5} )
+    message( STATUS "Using Qt5 in place of GLEW lib" )
+else()
     message( STATUS "Using GLEW lib" )
     set( USE_GLEW_LIB ON )
     add_definitions( -DCC_USE_GLEW )
-else()
-    message( STATUS "Using Qt5 in place of GLEW lib" )
 endif()
 
 # Libs requested by both qCC & ccViewer
