@@ -597,25 +597,8 @@ protected:
 	//! Returns real camera center (i.e. with z centered on the visible objects bounding-box in ortho mode)
 	CCVector3 getRealCameraCenter() const;
 
-	/***************************************************
-                    OpenGL Extensions
-	***************************************************/
-
-    //! Loads all available OpenGL extensions
-    static bool InitGLEW();
-
-    //! Checks for availability of a given OpenGL extension
-    static bool CheckExtension(const char *extName);
-
-    //! Shortcut: checks Shaders support
-    static bool CheckShadersAvailability();
-
-    //! Shortcut: checks FBO support
-    static bool CheckFBOAvailability();
-
-	//! Shortcut: checks VBO support
-    static bool CheckVBOAvailability();
-
+	bool InitGL() const;
+   
 	//! GL names picking buffer
     GLuint m_pickingBuffer[CC_PICKING_BUFFER_SIZE];
 

@@ -44,6 +44,7 @@
 #include <ccShader.h>
 #include <ccGlFilter.h>
 #include <ccFrameBufferObject.h>
+#include <ccFBOUtils.h>
 
 //QT
 #include <QtGui>
@@ -317,15 +318,15 @@ void ccGLWindow::initializeGL()
 	invalidateViewport();
 	invalidateVisualization();
 
-	//we initialize GLEW
-	InitGLEW();
+	//we initialize GL
+	InitGL();
 
 	//OpenGL version
 	if (!m_silentInitialization)
 		ccLog::Print("[3D View %i] GL version: %s",m_uniqueID,glGetString(GL_VERSION));
 
 	//Shaders and other OpenGL extensions
-	m_shadersEnabled = CheckShadersAvailability();
+	m_shadersEnabled = ccFBOUtils::CheckShadersAvailability();
 	if (!m_shadersEnabled)
 	{
 		//if no shader, no GL filter!
@@ -337,7 +338,7 @@ void ccGLWindow::initializeGL()
 		if (!m_silentInitialization)
 			ccLog::Print("[3D View %i] Shaders available",m_uniqueID);
 
-		m_glFiltersEnabled = CheckFBOAvailability();
+		m_glFiltersEnabled = ccFBOUtils::CheckFBOAvailability();
 		if (m_glFiltersEnabled)
 		{
 			if (!m_silentInitialization)
@@ -3622,58 +3623,23 @@ QString ccGLWindow::getShadersPath()
 #endif
 }
 
-//*********** OPENGL EXTENSIONS ***********//
-
-//! Loads all available OpenGL extensions
-bool ccGLWindow::InitGLEW()
+#ifdef CC_USE_GLEW
+bool ccGLWindow::InitGL() const
 {
-    #ifdef USE_GLEW
-    // GLEW initialization
-    GLenum code = glewInit();
-    if(code != GLEW_OK)
-    {
-        ccLog::Error("Error while initializing OpenGL extensions! (see console)");
-        ccLog::Warning("GLEW error: %s",glewGetErrorString(code));
-        return false;
-    }
-
-    ccLog::Print("GLEW: initialized!");
-    return true;
-    #else
-    return false;
-    #endif
+   GLenum   code = ccFBOUtils::InitGLEW();
+   
+   if ( code != GLEW_OK )
+   {
+      ccLog::Error("Error while initializing OpenGL extensions (see console)");
+      ccLog::Warning("GLEW error: %s",glewGetErrorString(code));
+      return false;
+   }
+   
+   ccLog::Print("GLEW: initialized!");
+   
+   return true;
 }
+#else
+bool ccGLWindow::InitGL() const { return true; }
+#endif
 
-bool ccGLWindow::CheckExtension(const char *extName)
-{
-    #ifdef USE_GLEW
-    return glewIsSupported(extName);
-    #else
-    return false;
-    #endif
-}
-
-bool ccGLWindow::CheckShadersAvailability()
-{
-    bool bARBShadingLanguage       = CheckExtension("GL_ARB_shading_language_100");
-    bool bARBShaderObjects         = CheckExtension("GL_ARB_shader_objects");
-    bool bARBVertexShader          = CheckExtension("GL_ARB_vertex_shader");
-    bool bARBFragmentShader        = CheckExtension("GL_ARB_fragment_shader");
-
-    bool bShadersSupported = bARBShadingLanguage &&
-                             bARBShaderObjects &&
-                             bARBVertexShader &&
-                             bARBFragmentShader;
-
-    return bShadersSupported;
-}
-
-bool ccGLWindow::CheckFBOAvailability()
-{
-    return CheckExtension("GL_EXT_framebuffer_object");
-}
-
-bool ccGLWindow::CheckVBOAvailability()
-{
-    return CheckExtension("GL_ARB_vertex_buffer_object");
-}
