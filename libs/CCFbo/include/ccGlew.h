@@ -18,6 +18,10 @@
 #ifndef CC_GLEW_HEADER
 #define CC_GLEW_HEADER
 
+#ifndef CC_USE_GLEW
+#warning Include of ccGlew.h should be wrapped in CC_USE_GLEW check...
+#endif
+
 //GLEW (must be included first)
 #include <GL/glew.h>
 #ifdef __APPLE__

@@ -22,7 +22,7 @@
 #include <ccPlatform.h>
 
 //GLEW (if needed, must be included first)
-#ifdef USE_GLEW
+#ifdef CC_USE_GLEW
 #include <GL/glew.h>
 #endif
 

@@ -25,6 +25,9 @@
 //Qt
 #include <QImageReader>
 #include <QFileInfo>
+#ifndef CC_USE_GLEW
+   #include <QOpenGLContext>
+#endif
 
 //System
 #include <assert.h>
@@ -135,9 +138,17 @@ bool ccImage::bindToGlTexture(ccGenericGLDisplay* win, bool pow2Texture/*=false*
         m_boundWin = win;
 		m_textureID = m_boundWin->getTexture(m_image);
 
+#ifdef CC_USE_GLEW
+      bool  non_power_2 = glewIsSupported("GL_ARB_texture_non_power_of_two");
+#else
+      QOpenGLContext *context = QOpenGLContext::currentContext();
+      
+      bool  non_power_2 = (context != NULL) && context->hasExtension( "GL_ARB_texture_non_power_of_two" );
+#endif
+      
 		//OpenGL version < 2.0 require texture with 2^n width & height
 		if (!win->supportOpenGLVersion(QGLFormat::OpenGL_Version_2_0)
-			&& glewIsSupported("GL_ARB_texture_non_power_of_two")==0)
+			&& !non_power_2)
 		{
 			// update nearest smaller power of 2 (for textures with old OpenGL versions)
 			unsigned paddedWidth = (m_width > 0 ? 1 << (unsigned)floor(log((double)m_width)/log(2.0)) : 0);

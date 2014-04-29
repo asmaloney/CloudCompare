@@ -19,7 +19,11 @@
 #define CC_GL_FILTER_HEADER
 
 //local
-#include "ccGlew.h"
+#ifdef CC_USE_GLEW
+   #include "ccGlew.h"
+#else
+   #include <QtGui/qopengl.h>
+#endif
 
 //system
 #include <string.h>

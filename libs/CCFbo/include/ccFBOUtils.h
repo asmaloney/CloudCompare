@@ -18,7 +18,11 @@
 #ifndef CC_FBO_UTILS
 #define CC_FBO_UTILS
 
-#include "ccGlew.h"
+#ifdef CC_USE_GLEW
+   #include "ccGlew.h"
+#else
+   #include <QOpenGLFunctions>
+#endif
 
 #define	TEX_1D_ON	glEnable(GL_TEXTURE_1D)
 #define	TEX_1D_OFF	glDisable(GL_TEXTURE_1D)
@@ -43,8 +47,10 @@ public:
                     OpenGL Extensions
 	***************************************************/
 
+#ifdef CC_USE_GLEW
     //! Loads all available OpenGL extensions
     static bool InitGLEW();
+#endif
 
     //! Checks for availability of a given OpenGL extension
     static bool CheckExtension(const char *extName);

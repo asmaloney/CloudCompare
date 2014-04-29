@@ -18,7 +18,11 @@
 #ifndef CC_FRAME_BUFFER_OBJECT
 #define CC_FRAME_BUFFER_OBJECT
 
-#include "ccGlew.h"
+#ifdef CC_USE_GLEW
+   #include "ccGlew.h"
+#else
+   #include <QtGui/qopengl.h>
+#endif
 
 const GLenum FBO_COLORS[] = {GL_COLOR_ATTACHMENT0_EXT,
                              GL_COLOR_ATTACHMENT1_EXT,

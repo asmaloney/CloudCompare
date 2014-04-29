@@ -69,6 +69,7 @@ void ccFBOUtils::DisplayTexture2DCorner(GLuint tex, int w, int h)
 }
 
 //*********** OPENGL EXTENSIONS ***********//
+#ifdef CC_USE_GLEW
 bool ccFBOUtils::InitGLEW()
 {
     // GLEW initialization
@@ -86,6 +87,18 @@ bool ccFBOUtils::CheckExtension(const char *extName)
 
     return (glewIsSupported(extName)>0);
 }
+#else
+bool ccFBOUtils::CheckExtension(const char *extName)
+{
+   QOpenGLContext *context = QOpenGLContext::currentContext();
+   
+   if ( context == NULL )
+      return false;
+   
+   return context->hasExtension( extName );
+}
+#endif
+
 
 bool ccFBOUtils::CheckShadersAvailability()
 {
