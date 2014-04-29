@@ -10,7 +10,10 @@ if(POLICY CMP0020)
 endif()
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
-include_directories( ${GLEW_LIB_SOURCE_DIR}/include )
+
+if( ${USE_GLEW_LIB} )
+    include_directories( ${GLEW_LIB_SOURCE_DIR}/include )
+endif()
 
 project( CC_FBO_LIB )
 
@@ -19,11 +22,14 @@ file( GLOB source_list src/*.cpp )
 
 add_library( ${PROJECT_NAME} STATIC ${header_list} ${source_list} )
 
-target_link_libraries( ${PROJECT_NAME} GLEW_LIB )
+if( ${USE_GLEW_LIB} )
+    target_link_libraries( ${PROJECT_NAME} GLEW_LIB )
+endif()
 
 # Default preprocessors
 set_default_cc_preproc( ${PROJECT_NAME} )
 
 # Add custom prepocessor definitions
-set_property( TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS USE_GLEW GLEW_STATIC )
-
+if( ${USE_GLEW_LIB} )
+    set_property( TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS USE_GLEW GLEW_STATIC )
+endif()

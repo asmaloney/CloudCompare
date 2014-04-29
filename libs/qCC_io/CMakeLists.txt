@@ -11,14 +11,16 @@ endif()
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 include_directories( ${EXTERNAL_LIBS_INCLUDE_DIR} )
-include_directories( ${GLEW_LIB_SOURCE_DIR}/include )
 include_directories( ${CC_CORE_LIB_SOURCE_DIR}/include )
 include_directories( ${CC_FBO_LIB_SOURCE_DIR}/include )
 include_directories( ${QCC_DB_LIB_SOURCE_DIR} )
 if( MSVC )
-   include_directories( ${QCC_DB_LIB_SOURCE_DIR}/msvc )
+    include_directories( ${QCC_DB_LIB_SOURCE_DIR}/msvc )
 endif()
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+if( ${USE_GLEW_LIB} )
+    include_directories( ${GLEW_LIB_SOURCE_DIR}/include )
+endif()
 
 project( QCC_IO_LIB )
 

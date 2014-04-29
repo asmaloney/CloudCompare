@@ -58,12 +58,23 @@ include( CMakeExternalLibs.cmake )
 # Contrib. libraries (mainly for I/O)
 include( contrib/AllSupport.cmake )
 
+# GLEW lib
+if( !USE_QT5 )
+    message( STATUS "Using GLEW lib" )
+    set( USE_GLEW_LIB ON )
+else()
+    message( STATUS "Using Qt5 in place of GLEW lib" )
+endif()
+
 # Libs requested by both qCC & ccViewer
-add_subdirectory( libs/Glew )
 add_subdirectory( libs/CCFbo )
 add_subdirectory( libs/qCC_db ) # must always be included after CCFbo (dependency)
 add_subdirectory( libs/qCC_io ) # must always be included after qCC_db (dependency)
 add_subdirectory( libs/qCC_glWindow ) # must always be included after qCC_db (dependency)
+
+if( ${USE_GLEW_LIB} )
+    add_subdirectory( libs/Glew )
+endif()
 
 # Define target folders
 # (now that ccViewer can have its own plugins, qCC and ccViewer must fall in separate folders!
@@ -99,12 +110,16 @@ if( ${OPTION_EXPORT_TARGETS} )
         #-> include_directories(${CCP_INCLUDE_DIRS})
     # and then they just need to link their plugins against ${CCP_LIBRARIES}
 
-    set(TARGETS_TO_EXPORT CC_CORE_LIB CC_FBO_LIB GLEW_LIB QCC_DB_LIB QCC_GL_LIB QCC_IO_LIB triangle)
-	
-	# add our own contrib dependencies!
-	if( ${OPTION_USE_DXF_LIB} )
-		list( APPEND TARGETS_TO_EXPORT DXF_LIB )
-	endif()
+    set(TARGETS_TO_EXPORT CC_CORE_LIB CC_FBO_LIB QCC_DB_LIB QCC_GL_LIB QCC_IO_LIB triangle)
+
+    if( ${USE_GLEW_LIB} )
+        set(TARGETS_TO_EXPORT ${TARGETS_TO_EXPORT} GLEW_LIB)
+    endif()
+
+    # add our own contrib dependencies!
+    if( ${OPTION_USE_DXF_LIB} )
+        list( APPEND TARGETS_TO_EXPORT DXF_LIB )
+    endif()
 
     if( ${INSTALL_QPCL_PLUGIN} )
         # we also export the shared lib produced by that
