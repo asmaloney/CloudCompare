@@ -21,7 +21,7 @@
 #include <ccFrameBufferObject.h>
 #include <ccBilateralFilter.h>
 #include <ccShader.h>
-#include <ccFBOUtils.h>
+#include <ccOpenGLUtils.h>
 
 //system
 #include <math.h>
@@ -323,7 +323,7 @@ void ccEDLFilter::shade(GLuint texDepth, GLuint texColor, float z_min, float z_m
 		glBindTexture(GL_TEXTURE_2D, texColor);
 
 		glActiveTexture(GL_TEXTURE0);
-		ccFBOUtils::DisplayTexture2DCorner(texDepth,m_screenWidth,m_screenHeight);
+		ccOpenGLUtils::DisplayTexture2DCorner(texDepth,m_screenWidth,m_screenHeight);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -359,7 +359,7 @@ void ccEDLFilter::shade(GLuint texDepth, GLuint texColor, float z_min, float z_m
 		glBindTexture(GL_TEXTURE_2D, texColor);
 
 		glActiveTexture(GL_TEXTURE0);
-		ccFBOUtils::DisplayTexture2DCorner(texDepth,m_screenWidth/2,m_screenHeight/2);
+		ccOpenGLUtils::DisplayTexture2DCorner(texDepth,m_screenWidth/2,m_screenHeight/2);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -395,7 +395,7 @@ void ccEDLFilter::shade(GLuint texDepth, GLuint texColor, float z_min, float z_m
 		glBindTexture(GL_TEXTURE_2D, texColor);
 
 		glActiveTexture(GL_TEXTURE0);
-		ccFBOUtils::DisplayTexture2DCorner(texDepth,m_screenWidth/4,m_screenHeight/4);
+		ccOpenGLUtils::DisplayTexture2DCorner(texDepth,m_screenWidth/4,m_screenHeight/4);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -456,7 +456,7 @@ void ccEDLFilter::shade(GLuint texDepth, GLuint texColor, float z_min, float z_m
 		glActiveTexture(GL_TEXTURE0);
 		//TEX_2D_ON;
 
-		ccFBOUtils::DisplayTexture2DCorner(m_bilateralFilter0.filter ? m_bilateralFilter0.filter->getTexture() : fbo_edl0->getColorTexture(0),m_screenWidth,m_screenHeight);
+		ccOpenGLUtils::DisplayTexture2DCorner(m_bilateralFilter0.filter ? m_bilateralFilter0.filter->getTexture() : fbo_edl0->getColorTexture(0),m_screenWidth,m_screenHeight);
 
 		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D,0);

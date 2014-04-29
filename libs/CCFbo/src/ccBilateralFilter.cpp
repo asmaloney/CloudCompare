@@ -20,7 +20,7 @@
 //Local
 #include "ccFrameBufferObject.h"
 #include "ccShader.h"
-#include "ccFBOUtils.h"
+#include "ccOpenGLUtils.h"
 
 //system
 #include <math.h>
@@ -167,7 +167,7 @@ void ccBilateralFilter::shade(GLuint texDepth, GLuint texColor, float zoom)
     //TEX_2D_ON;
     //glBindTexture(GL_TEXTURE_2D,texColor);
 
-    ccFBOUtils::DisplayTexture2DCorner(texColor,m_width,m_height);
+    ccOpenGLUtils::DisplayTexture2DCorner(texColor,m_width,m_height);
 
     //Texture 0 --> 2D
     //glActiveTexture(GL_TEXTURE0);

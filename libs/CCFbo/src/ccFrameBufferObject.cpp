@@ -18,7 +18,7 @@
 #include "ccFrameBufferObject.h"
 #include "ccShader.h"
 
-#include "ccFBOUtils.h"
+#include "ccOpenGLUtils.h"
 
 #include <assert.h>
 
@@ -72,7 +72,7 @@ void ccFrameBufferObject::reset()
 bool ccFrameBufferObject::init(unsigned w, unsigned h)
 {
     //we check if FBO extension is supported by video card
-    if (!ccFBOUtils::CheckExtension("GL_EXT_framebuffer_object"))
+    if (!ccOpenGLUtils::CheckExtension("GL_EXT_framebuffer_object"))
         return false;
 
     //to support reinit

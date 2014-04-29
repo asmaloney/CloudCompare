@@ -20,7 +20,7 @@
 #include <ccFrameBufferObject.h>
 #include <ccBilateralFilter.h>
 #include <ccShader.h>
-#include <ccFBOUtils.h>
+#include <ccOpenGLUtils.h>
 
 //RandomKit
 #include <randomkit.h>
@@ -247,7 +247,7 @@ void ccSSAOFilter::shade(GLuint texDepth, GLuint texColor, float zoom)
     glActiveTexture(GL_TEXTURE0);
     //glBindTexture(GL_TEXTURE_2D,texDepth);
 
-	ccFBOUtils::DisplayTexture2DCorner(texDepth,w,h);
+	ccOpenGLUtils::DisplayTexture2DCorner(texDepth,w,h);
 
     //glActiveTexture(GL_TEXTURE0);
     //glBindTexture(GL_TEXTURE_2D,0);

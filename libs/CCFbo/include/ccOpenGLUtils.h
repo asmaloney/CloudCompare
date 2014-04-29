@@ -15,8 +15,8 @@
 //#                                                                        #
 //##########################################################################
 
-#ifndef CC_FBO_UTILS
-#define CC_FBO_UTILS
+#ifndef CC_OPENGL_UTILS
+#define CC_OPENGL_UTILS
 
 #ifdef CC_USE_GLEW
    #include "ccGlew.h"
@@ -31,8 +31,8 @@
 #define	TEX_3D_ON	glEnable(GL_TEXTURE_3D)
 #define	TEX_3D_OFF	glDisable(GL_TEXTURE_3D)
 
-//! Misc. FBO management related methods
-class ccFBOUtils
+//! Misc. OpenGL related methods
+class ccOpenGLUtils
 {
 public:
 

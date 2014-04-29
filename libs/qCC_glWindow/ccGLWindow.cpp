@@ -44,7 +44,7 @@
 #include <ccShader.h>
 #include <ccGlFilter.h>
 #include <ccFrameBufferObject.h>
-#include <ccFBOUtils.h>
+#include <ccOpenGLUtils.h>
 
 //QT
 #include <QtGui>
@@ -326,7 +326,7 @@ void ccGLWindow::initializeGL()
 		ccLog::Print("[3D View %i] GL version: %s",m_uniqueID,glGetString(GL_VERSION));
 
 	//Shaders and other OpenGL extensions
-	m_shadersEnabled = ccFBOUtils::CheckShadersAvailability();
+	m_shadersEnabled = ccOpenGLUtils::CheckShadersAvailability();
 	if (!m_shadersEnabled)
 	{
 		//if no shader, no GL filter!
@@ -338,7 +338,7 @@ void ccGLWindow::initializeGL()
 		if (!m_silentInitialization)
 			ccLog::Print("[3D View %i] Shaders available",m_uniqueID);
 
-		m_glFiltersEnabled = ccFBOUtils::CheckFBOAvailability();
+		m_glFiltersEnabled = ccOpenGLUtils::CheckFBOAvailability();
 		if (m_glFiltersEnabled)
 		{
 			if (!m_silentInitialization)
@@ -3626,7 +3626,7 @@ QString ccGLWindow::getShadersPath()
 #ifdef CC_USE_GLEW
 bool ccGLWindow::InitGL() const
 {
-   GLenum   code = ccFBOUtils::InitGLEW();
+   GLenum   code = ccOpenGLUtils::InitGLEW();
    
    if ( code != GLEW_OK )
    {

@@ -15,15 +15,15 @@
 //#                                                                        #
 //##########################################################################
 
-#include "ccFBOUtils.h"
-
 #ifdef USE_VLD
 //VLD
 #include <vld.h>
 #endif
 
+#include "ccOpenGLUtils.h"
+
 //*********** OPENGL TEXTURES ***********//
-void ccFBOUtils::DisplayTexture2D(GLuint tex, int w, int h)
+void ccOpenGLUtils::DisplayTexture2D(GLuint tex, int w, int h)
 {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -47,7 +47,7 @@ void ccFBOUtils::DisplayTexture2D(GLuint tex, int w, int h)
     glDisable(GL_TEXTURE_2D);
 }
 
-void ccFBOUtils::DisplayTexture2DCorner(GLuint tex, int w, int h)
+void ccOpenGLUtils::DisplayTexture2DCorner(GLuint tex, int w, int h)
 {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -70,12 +70,12 @@ void ccFBOUtils::DisplayTexture2DCorner(GLuint tex, int w, int h)
 
 //*********** OPENGL EXTENSIONS ***********//
 #ifdef CC_USE_GLEW
-GLenum ccFBOUtils::InitGLEW()
+GLenum ccOpenGLUtils::InitGLEW()
 {
     return glewInit();
 }
 
-bool ccFBOUtils::CheckExtension(const char *extName)
+bool ccOpenGLUtils::CheckExtension(const char *extName)
 {
 	if ( InitGLEW() != GLEW_OK )
 		return false;
@@ -83,7 +83,7 @@ bool ccFBOUtils::CheckExtension(const char *extName)
     return (glewIsSupported(extName)>0);
 }
 #else
-bool ccFBOUtils::CheckExtension(const char *extName)
+bool ccOpenGLUtils::CheckExtension(const char *extName)
 {
    QOpenGLContext *context = QOpenGLContext::currentContext();
    
@@ -95,7 +95,7 @@ bool ccFBOUtils::CheckExtension(const char *extName)
 #endif
 
 
-bool ccFBOUtils::CheckShadersAvailability()
+bool ccOpenGLUtils::CheckShadersAvailability()
 {
     bool bARBShadingLanguage       = CheckExtension("GL_ARB_shading_language_100");
     bool bARBShaderObjects         = CheckExtension("GL_ARB_shader_objects");
@@ -110,12 +110,12 @@ bool ccFBOUtils::CheckShadersAvailability()
     return bShadersSupported;
 }
 
-bool ccFBOUtils::CheckFBOAvailability()
+bool ccOpenGLUtils::CheckFBOAvailability()
 {
     return CheckExtension("GL_EXT_framebuffer_object");
 }
 
-bool ccFBOUtils::CheckVBOAvailability()
+bool ccOpenGLUtils::CheckVBOAvailability()
 {
     return CheckExtension("GL_ARB_vertex_buffer_object");
 }
