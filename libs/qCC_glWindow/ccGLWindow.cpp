@@ -573,9 +573,12 @@ void ccGLWindow::paintGL()
 		}
 	}
 
+   if ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE)
+      return;
+   
 	//if any, we display texture fullscreen
 	if (glIsTexture(screenTex))
-	{
+	{      
 		ccGLUtils::DisplayTexture2D(screenTex,m_glWidth,m_glHeight);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
