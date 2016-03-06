@@ -18,7 +18,14 @@
 #ifndef CC_FRAME_BUFFER_OBJECT
 #define CC_FRAME_BUFFER_OBJECT
 
+#include <QtGlobal>
+
+#ifdef Q_OS_MAC
+#include <QOpenGLFunctions_2_1>
+#include <QOpenGLExtensions>
+#else
 #include <QOpenGLFunctions_3_0>
+#endif
 
 //! F.B.O. encapsulation
 /** Compared to the QOpenGLFramebufferObject class, this one offers the possibility to:
@@ -31,13 +38,15 @@ public:
 	ccFrameBufferObject();
 	~ccFrameBufferObject();
 
-	bool init(unsigned w, unsigned h, QOpenGLFunctions_3_0* glFunc);
+	bool init(unsigned w, unsigned h, QAbstractOpenGLFunctions* glFunc);
 	void reset();
 	void start();
 	void stop();
 
 	inline bool isValid() const { return m_fboId; }
 
+	void bindFrameBuffer( GLuint framebuffer );
+	
 	bool initColor(	GLint internalformat,
 					GLenum format,
 					GLenum type,
@@ -85,7 +94,13 @@ protected:
 	GLuint m_fboId;
 
 	//! Associated OpenGL functions
+#ifdef Q_OS_MAC
+	// For Mac OS X, we need to use 2.1 + extensions to get FBOs
+	QOpenGLFunctions_2_1	*m_glFunc;
+	QOpenGLExtension_ARB_framebuffer_object	mExtensionFBOFuncs;	
+#else
 	QOpenGLFunctions_3_0* m_glFunc;
+#endif
 };
 
 #endif

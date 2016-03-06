@@ -12,3 +12,6 @@ add_library( ${PROJECT_NAME} STATIC ${header_list} ${source_list} )
 
 qt5_use_modules(${PROJECT_NAME} Core OpenGL ) # Core + OpenGL
 
+if ( APPLE )
+    qt5_use_modules(${PROJECT_NAME} OpenGLExtensions )
+endif()

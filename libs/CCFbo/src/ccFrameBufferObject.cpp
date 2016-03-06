@@ -27,7 +27,7 @@ ccFrameBufferObject::ccFrameBufferObject()
 	, m_colorTexture(0)
 	, m_ownColorTexture(false)
 	, m_fboId(0)
-	, m_glFunc(0)
+	, m_glFunc(nullptr)
 {}
 
 ccFrameBufferObject::~ccFrameBufferObject()
@@ -39,7 +39,7 @@ void ccFrameBufferObject::reset()
 {
 	if (m_depthTexture != 0)
 	{
-		if (m_glFunc)
+		if (m_glFunc != nullptr)
 		{
 			m_glFunc->glDeleteTextures(1, &m_depthTexture);
 		}
@@ -50,46 +50,80 @@ void ccFrameBufferObject::reset()
 
 	if (m_fboId != 0)
 	{
+#ifdef Q_OS_MAC
+		mExtensionFBOFuncs.glDeleteFramebuffers(1, &m_fboId);
+#else
 		if (m_glFunc)
 		{
 			m_glFunc->glDeleteFramebuffers(1, &m_fboId);
 		}
+#endif
 		m_fboId = 0;
 	}
 
 	m_width = m_height = 0;
 }
 
-bool ccFrameBufferObject::init(unsigned w, unsigned h, QOpenGLFunctions_3_0* glFunc)
+bool ccFrameBufferObject::init(unsigned w, unsigned h, QAbstractOpenGLFunctions* glFunc)
 {
-	if (!glFunc)
+	if (glFunc == nullptr)
 	{
 		return false;
 	}
 
+#ifdef Q_OS_MAC
+	bool	init = mExtensionFBOFuncs.initializeOpenGLFunctions();
+	
+	if ( !init )
+	{
+		return false;
+	}
+#endif
+	
 	//to support reinit
 	reset();
 
 	m_width = w;
 	m_height = h;
-	m_glFunc = glFunc;
-
+	
+#ifdef Q_OS_MAC
+	m_glFunc = dynamic_cast<QOpenGLFunctions_2_1 *>(glFunc);
+#else
+	m_glFunc = dynamic_cast<QOpenGLFunctions_3_0 *>(glFunc);
+#endif
+	if (glFunc == nullptr)
+	{
+		return false;
+	}
+	
 	// create a framebuffer object
+#ifdef Q_OS_MAC
+	mExtensionFBOFuncs.glGenFramebuffers(1, &m_fboId);
+#else
 	m_glFunc->glGenFramebuffers(1, &m_fboId);
+#endif
 
 	return m_fboId != 0;
 }
 
 void ccFrameBufferObject::start()
 {
-	if (m_glFunc)
-		m_glFunc->glBindFramebuffer(GL_FRAMEBUFFER_EXT, m_fboId);
+	bindFrameBuffer( m_fboId );
 }
 
 void ccFrameBufferObject::stop()
 {
+	bindFrameBuffer( 0 );
+}
+
+void ccFrameBufferObject::bindFrameBuffer( GLuint framebuffer )
+{
+#ifdef Q_OS_MAC
+	mExtensionFBOFuncs.glBindFramebuffer(GL_FRAMEBUFFER_EXT, framebuffer);
+#else
 	if (m_glFunc)
-		m_glFunc->glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		m_glFunc->glBindFramebuffer(GL_FRAMEBUFFER_EXT, framebuffer);
+#endif
 }
 
 GLuint ccFrameBufferObject::getID()
@@ -114,24 +148,25 @@ bool ccFrameBufferObject::attachColor(	GLuint texID,
 										bool ownTexture/*=false*/,
 										GLenum target/*=GL_TEXTURE_2D*/)
 {
-	if (!m_glFunc)
-	{
-		assert(false);
-		return false;
-	}
 	if (m_fboId == 0)
 	{
 		assert(false);
 		return false;
 	}
-
+	
+	if (m_glFunc == nullptr)
+	{
+		assert(false);
+		return false;
+	}
+	
 	if (!m_glFunc->glIsTexture(texID))
 	{
 		//error or simple warning?
 		assert(false);
 		//return false;
 	}
-
+	
 	//remove the previous texture (if any)
 	deleteColorTexture();
 
@@ -140,10 +175,17 @@ bool ccFrameBufferObject::attachColor(	GLuint texID,
 
 	start();
 
+#ifdef Q_OS_MAC
+	mExtensionFBOFuncs.glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, target, texID, 0);
+
+	GLenum status = mExtensionFBOFuncs.glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
+#else
 	m_glFunc->glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, target, texID, 0);
 
-	bool success = false;
 	GLenum status = m_glFunc->glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
+#endif
+	
+	bool success = false;
 	switch (status)
 	{
 	case GL_FRAMEBUFFER_COMPLETE_EXT:
@@ -165,11 +207,12 @@ bool ccFrameBufferObject::initColor(	GLint internalformat,
 										GLint minMagFilter /*= GL_LINEAR*/,
 										GLenum target /*= GL_TEXTURE_2D*/)
 {
-	if (!m_glFunc)
+	if (m_glFunc == nullptr)
 	{
 		assert(false);
 		return false;
 	}
+
 	if (m_fboId == 0)
 	{
 		//ccLog::Warning("[FBO::initTexture] Internal error: FBO not yet initialized!");
@@ -191,7 +234,7 @@ bool ccFrameBufferObject::initColor(	GLint internalformat,
 	m_glFunc->glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	m_glFunc->glTexImage2D   (target, 0, internalformat, m_width, m_height, 0, format, type, 0);
 	m_glFunc->glBindTexture  (target, 0);
-
+	
 	return attachColor(texID, true, target);
 }
 
@@ -200,11 +243,12 @@ bool ccFrameBufferObject::initDepth(GLint wrapParam /*=GL_CLAMP_TO_BORDER*/,
 									GLint minMagFilter /*= GL_NEAREST*/,
 									GLenum target/*=GL_TEXTURE_2D*/)
 {
-	if (!m_glFunc)
+	if (m_glFunc == nullptr)
 	{
 		assert(false);
 		return false;
 	}
+	
 	if (m_fboId == 0)
 	{
 		//ccLog::Warning("[FBO::initDepth] Internal error: FBO not yet initialized!");
@@ -230,12 +274,21 @@ bool ccFrameBufferObject::initDepth(GLint wrapParam /*=GL_CLAMP_TO_BORDER*/,
 	m_glFunc->glTexParameteri(target, GL_TEXTURE_MAG_FILTER, minMagFilter);
 	m_glFunc->glTexImage2D(target, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
 
+#ifdef Q_OS_MAC
+	mExtensionFBOFuncs.glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, target, m_depthTexture, 0);
+#else
 	m_glFunc->glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, target, m_depthTexture, 0);
-
+#endif
+	
 	m_glFunc->glBindTexture(target, 0);
 
 	bool success = false;
+#ifdef Q_OS_MAC
+	GLenum status = mExtensionFBOFuncs.glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
+#else
 	GLenum status = m_glFunc->glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
+#endif
+	
 	switch (status)
 	{
 	case GL_FRAMEBUFFER_COMPLETE_EXT:

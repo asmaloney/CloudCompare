@@ -330,8 +330,12 @@ bool ccGLWindow::initFBOSafe(ccFrameBufferObject* &fbo, int w, int h)
 		return true;
 	}
 
-	QOpenGLFunctions_3_0* gl32Func = this->context()->versionFunctions<QOpenGLFunctions_3_0>();
-	if (!gl32Func)
+#ifdef Q_OS_MAC
+	QOpenGLFunctions_2_1* glFunc = this->context()->versionFunctions<QOpenGLFunctions_2_1>();
+#else
+	QOpenGLFunctions_3_0* glFunc = this->context()->versionFunctions<QOpenGLFunctions_3_0>();
+#endif
+	if (!glFunc)
 	{
 		return false;
 	}
@@ -346,7 +350,7 @@ bool ccGLWindow::initFBOSafe(ccFrameBufferObject* &fbo, int w, int h)
 		_fbo = new ccFrameBufferObject();
 	}
 
-	if (	!_fbo->init(w, h, gl32Func)
+	if (	!_fbo->init(w, h, glFunc)
 		||	!_fbo->initColor(GL_RGBA, GL_RGBA, GL_FLOAT)
 		||	!_fbo->initDepth(GL_CLAMP_TO_BORDER, GL_DEPTH_COMPONENT32, GL_NEAREST, GL_TEXTURE_2D))
 	{
@@ -1833,7 +1837,7 @@ void ccGLWindow::fullRenderingPass(CC_DRAW_CONTEXT& CONTEXT, RenderingParams& re
 		if (renderingParams.drawBackground || renderingParams.draw3DPass)
 		{
 			currentFBO->stop();
-			this->context()->versionFunctions<QOpenGLFunctions_3_0>()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, defaultFramebufferObject());
+			currentFBO->bindFrameBuffer( defaultFramebufferObject() );
 			ccGLUtils::CatchGLError(glFunc->glGetError(), "ccGLWindow::fullRenderingPass (FBO stop)");
 			m_updateFBO = false;
 		}
@@ -1858,7 +1862,7 @@ void ccGLWindow::fullRenderingPass(CC_DRAW_CONTEXT& CONTEXT, RenderingParams& re
 				//apply shader
 				QOpenGLFunctions_3_0* gl32Func = this->context()->versionFunctions<QOpenGLFunctions_3_0>();
 				m_activeGLFilter->shade(gl32Func, depthTex, colorTex, parameters);
-				this->context()->versionFunctions<QOpenGLFunctions_3_0>()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, defaultFramebufferObject()); //the active filter can also enable/disable FBOs!
+				currentFBO->bindFrameBuffer( defaultFramebufferObject() );
 				ccGLUtils::CatchGLError(glFunc->glGetError(), "ccGLWindow::paintGL/glFilter shade");
 
 				//if capture mode is ON: we only want to capture it, not to display it
@@ -5403,7 +5407,7 @@ QImage ccGLWindow::renderToImage(	float zoomFactor/*=1.0*/,
 
 			//disable the FBO
 			fbo->stop();
-			this->context()->versionFunctions<QOpenGLFunctions_3_0>()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, defaultFramebufferObject());
+			fbo->bindFrameBuffer( defaultFramebufferObject() );
 			ccGLUtils::CatchGLError(glFunc->glGetError(), "ccGLWindow::renderToFile/FBO stop");
 
 			CONTEXT.flags = CC_DRAW_2D | CC_DRAW_FOREGROUND;
@@ -5449,7 +5453,7 @@ QImage ccGLWindow::renderToImage(	float zoomFactor/*=1.0*/,
 				ccGLUtils::DisplayTexture2D(context(), filter->getTexture(), CONTEXT.glW, CONTEXT.glH);
 				//glClear(GL_DEPTH_BUFFER_BIT);
 				fbo->stop();
-				this->context()->versionFunctions<QOpenGLFunctions_3_0>()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, defaultFramebufferObject());
+				fbo->bindFrameBuffer( defaultFramebufferObject() );
 			}
 
 			fbo->start();
@@ -5496,7 +5500,7 @@ QImage ccGLWindow::renderToImage(	float zoomFactor/*=1.0*/,
 			glFunc->glReadBuffer(GL_NONE);
 
 			fbo->stop();
-			this->context()->versionFunctions<QOpenGLFunctions_3_0>()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, defaultFramebufferObject());
+			fbo->bindFrameBuffer( defaultFramebufferObject() );
 
 			if (m_fbo != fbo)
 			{
