@@ -13,7 +13,7 @@ install:
   libavcodec-dev libavformat-dev libavutil-dev libboost-thread-dev
   libboost-program-options-dev libcgal-dev libcgal-qt5-dev
   libdlib-dev libswscale-dev libtbb-dev
-  libqt5opengl5-dev qt5-default qttools5-dev qttools5-dev-tools 
+  libqt5opengl5-dev qt5-default qttools5-dev qttools5-dev-tools
   libproj-dev libdlib-dev
 - sudo apt-get install -qy xvfb
 - git submodule init && git submodule update
@@ -50,7 +50,7 @@ before_script:
   ..
 script:
 - if [[ $TRAVIS_BRANCH != "beta_builds" ]]; then make -j2; fi
-- xvfb-run ctest
+- xvfb-run ctest -v1
 - cd ..
 after_success:
 - openssl aes-256-cbc -K $encrypted_d04fcf964026_key -iv $encrypted_d04fcf964026_iv
