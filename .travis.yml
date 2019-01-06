@@ -3,8 +3,13 @@ dist: xenial
 cache: ccache
 language: cpp
 compiler:
-- clang
-- gcc
+  - clang
+  - gcc
+env:
+  matrix:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
+
 install:
 - sudo apt-get update -qq
 - sudo apt-get install -qy cmake
@@ -19,9 +24,9 @@ install:
 - git submodule init && git submodule update
 
 before_script:
-- mkdir build
-- cd build
-- cmake -DCMAKE_BUILD_TYPE=Release
+- mkdir build-${BUILD_TYPE}
+- cd build-${BUILD_TYPE}
+- cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   -DEIGEN_ROOT_DIR=/usr/include/eigen3
   -DCOMPILE_CC_CORE_LIB_WITH_TBB=ON
   -DOPTION_USE_DXF_LIB=ON
@@ -48,6 +53,7 @@ before_script:
   -DINSTALL_QSSAO_PLUGIN=ON
   -DBUILD_TESTING=ON
   ..
+
 script:
 - if [[ $TRAVIS_BRANCH != "beta_builds" ]]; then make -j2; fi
 - xvfb-run ctest -v1
